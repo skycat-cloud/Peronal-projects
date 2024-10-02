@@ -67,6 +67,7 @@ public class AdminMenu { // 메뉴 추가/삭제
         deleteMenu();
       }
       case 3 -> {
+        authPassword = false;
         BurgerMenu.mainmenu(); // 키오스크 메인 메뉴로 돌아가기
         MainMenuSelect.mainmenuselect(); // 메인 메뉴 선택자
       }
