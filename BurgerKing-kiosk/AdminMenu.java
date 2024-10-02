@@ -1,3 +1,7 @@
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
@@ -91,6 +95,7 @@ public class AdminMenu { // 메뉴 추가/삭제
 
       BurgerMenu.burgerMenu.add(new Burger(name, calories, price));
       System.out.println("메뉴가 추가되었습니다.");
+      updateDatabase("INSERT INTO burger_menu (name, calories, price) VALUES ('" + name + "', " + calories + ", " + price + ")");
 
       TimeUnit.SECONDS.sleep(1); // 1초 대기
       admin(); // 메뉴 추가 후 다시 관리자 메뉴로 돌아감
@@ -108,13 +113,14 @@ public class AdminMenu { // 메뉴 추가/삭제
       int removeIndex = scanner.nextInt(); // 삭제할 메뉴 번호 입력
 
       if (removeIndex > 0 && removeIndex <= BurgerMenu.burgerMenu.size()) {
+        String name = BurgerMenu.burgerMenu.get(removeIndex - 1).name; // 삭제할 메뉴 번호
         BurgerMenu.burgerMenu.remove(removeIndex - 1);
         System.out.println("메뉴가 삭제되었습니다.");
+        updateDatabase("DELETE FROM burger_menu WHERE name = '" + name + "'");
+
         TimeUnit.SECONDS.sleep(1); // 1초 대기
         admin(); // 메뉴 삭제 후 다시 관리자 메뉴로 돌아감
-      } 
-      
-      else {
+      } else {
         System.out.println("잘못된 메뉴 번호입니다.");
         admin(); // 다시 관리자 메뉴로 돌아감
       }
@@ -122,6 +128,15 @@ public class AdminMenu { // 메뉴 추가/삭제
       System.out.println("오류 발생. 다시 시도해 주세요.");
       scanner.nextLine(); // 버퍼 비우기
       admin(); // 다시 관리자 메뉴로 돌아감
+    }
+  }
+
+  private static void updateDatabase(String query) {
+    try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/burgerdb", "root", "2012");
+      Statement stmt = conn.createStatement()) {
+      stmt.executeUpdate(query);
+    } catch (SQLException e) {
+      e.printStackTrace();
     }
   }
 }
